@@ -1,8 +1,10 @@
 import Color from './Color'
 import Layer from './Layer'
+import { makeGroundTile, makeSolidTile } from './Objects'
 import Renderer from './Renderer'
 import Tile from './Tile'
 import Vector from './Vector'
+import World from './World'
 
 const WIDTH = 80
 const HEIGHT = 24
@@ -20,16 +22,9 @@ const player = new Tile({
   pos: new Vector(WIDTH / 2, HEIGHT / 2),
 })
 
-const backgroundTiles = Array.from({ length: WIDTH * HEIGHT }, (_, i) => {
-  const x = i % WIDTH
-  1
-  const y = Math.floor(i / WIDTH)
+const world = new World()
 
-  return new Tile({
-    char: x === 0 || x === WIDTH - 1 ? '#' : y === 0 || y === HEIGHT - 1 ? '#' : '.',
-    pos: new Vector(x, y),
-  })
-})
+const backgroundTiles = world.tiles
 
 const getDistance = (v1: Vector, v2: Vector) =>
   Math.round(Math.sqrt(Math.pow(v1.x - v2.x, 2) + Math.pow(v1.y - v2.y, 2)))
@@ -81,25 +76,60 @@ document.addEventListener('readystatechange', () => {
 document.addEventListener('keydown', (e) => {
   switch (e.key) {
     case 'ArrowUp': {
-      player.pos.add(new Vector(0, -1))
+      const newPlayerPos = player.pos.clone().add(new Vector(0, -1))
+      // How do we get a bg tile by coordinates quicker than O(n)?
+      const bgRef = backgroundTiles.find((bg) => bg.pos.x === newPlayerPos.x && bg.pos.y === newPlayerPos.y)
+
+      if (bgRef.isSolid) {
+        console.log('Ouch!')
+        return
+      }
+
+      player.pos = newPlayerPos
       draw()
       break
     }
     case 'ArrowDown': {
-      player.pos.add(new Vector(0, 1))
+      const newPlayerPos = player.pos.clone().add(new Vector(0, 1))
+      // How do we get a bg tile by coordinates quicker than O(n)?
+      const bgRef = backgroundTiles.find((bg) => bg.pos.x === newPlayerPos.x && bg.pos.y === newPlayerPos.y)
+
+      if (bgRef.isSolid) {
+        console.log('Ouch!')
+        return
+      }
+
+      player.pos = newPlayerPos
       draw()
       break
     }
     case 'ArrowLeft': {
-      player.pos.add(new Vector(-1, 0))
+      const newPlayerPos = player.pos.clone().add(new Vector(-1, 0))
+      // How do we get a bg tile by coordinates quicker than O(n)?
+      const bgRef = backgroundTiles.find((bg) => bg.pos.x === newPlayerPos.x && bg.pos.y === newPlayerPos.y)
+
+      if (bgRef.isSolid) {
+        console.log('Ouch!')
+        return
+      }
+
+      player.pos = newPlayerPos
       draw()
       break
     }
     case 'ArrowRight': {
-      player.pos.add(new Vector(1, 0))
+      const newPlayerPos = player.pos.clone().add(new Vector(1, 0))
+      // How do we get a bg tile by coordinates quicker than O(n)?
+      const bgRef = backgroundTiles.find((bg) => bg.pos.x === newPlayerPos.x && bg.pos.y === newPlayerPos.y)
+
+      if (bgRef.isSolid) {
+        console.log('Ouch!')
+        return
+      }
+
+      player.pos = newPlayerPos
       draw()
       break
     }
   }
 })
-
