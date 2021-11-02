@@ -20,11 +20,7 @@ const buildSquare = (size: Vector) => {
       (pos.x === 0 && (pos.y === 0 || pos.y === size.y - 1)) ||
       (pos.x === size.x - 1 && (pos.y === 0 || pos.y === size.y - 1))
 
-    const isEdge =
-      (pos.x === 0 && !isCorner) ||
-      (pos.y === 0 && !isCorner) ||
-      (pos.y === size.y - 1 && !isCorner) ||
-      (pos.x === size.x - 1 && !isCorner)
+    const isEdge = !isCorner && (pos.x === 0 || pos.y === 0 || pos.y === size.y - 1 || pos.x === size.x - 1)
 
     if (isEdge) console.log(numberPossibleDoorPositions * Math.random())
 
