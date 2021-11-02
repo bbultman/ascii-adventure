@@ -13,16 +13,18 @@ const buildSquare = (size: Vector) => {
 
   let totalDoors = (numberPossibleDoorPositions / 10) * Math.random() + 1
 
-  console.log('building square, total door positions is', numberPossibleDoorPositions, totalDoors)
-
-  const roomTiles = vectorExpand(size).map((pos) => {
+  const roomTiles = vectorExpand(size).map((pos, i) => {
     const isCorner =
       (pos.x === 0 && (pos.y === 0 || pos.y === size.y - 1)) ||
       (pos.x === size.x - 1 && (pos.y === 0 || pos.y === size.y - 1))
 
     const isEdge = !isCorner && (pos.x === 0 || pos.y === 0 || pos.y === size.y - 1 || pos.x === size.x - 1)
+    //const doorSeed = Math.sin(i * totalDoors * Math.random())
+    //const isDoor = isEdge ? doorSeed > 0.9 : false
 
-    if (isEdge) console.log(numberPossibleDoorPositions * Math.random())
+    //if (isEdge) {
+    //  console.log(i, pos, doorSeed, isDoor)
+    //}
 
     return isCorner
       ? makeSolidTile({ pos, char: '^' })
