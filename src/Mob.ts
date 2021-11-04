@@ -62,9 +62,13 @@ export default class Mob {
     const index = Math.floor(Math.random() * matrix.length)
     const movePos = matrix[index];
 
-    this.position = movePos
-    this.tile.pos = this.position
+    this.moveTo(movePos)
     
     return this.position
+  }
+
+  moveTo(pos: Vector) {
+    this.position = pos
+    this.tile.pos = this.position
   }
 }
