@@ -17,6 +17,10 @@ export default class Vector {
     return new Vector(this.x, this.y);
   }
 
+  equal(v: Vector) {
+    return v.x === this.x && v.y === this.y
+  }
+
   static add(v1:Vector, v2:Vector) {
     return v1.clone().add(v2);
   }
