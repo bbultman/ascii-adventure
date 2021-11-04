@@ -139,8 +139,33 @@ const generateInfoTiles = (size: Vector, player: Player) => {
   return infoTiles;
 };
 
-const fastDist = (v: Vector, v2: Vector) =>
-  Math.pow(v2.x - v.x, 2) + Math.pow(v2.y - v.y, 2);
+const findNextStep = (grid: Tile[], start: Vector, goal: Vector) => {
+  const xDelta = goal.x - start.x;
+  const yDelta = goal.y - start.y;
+
+  const horizontal = Math.abs(xDelta) > Math.abs(yDelta);
+
+  const xMove = xDelta > 0 ? new Vector(1, 0) : new Vector(-1, 0);
+  const yMove = yDelta > 0 ? new Vector(0, 1) : new Vector(0, -1);
+
+  const naiiveDelta = horizontal ? xMove : yMove;
+
+  const inverseNaiiveDelta = !horizontal ? xMove : yMove;
+
+  const naiivePos = naiiveDelta.add(start);
+  const secondNaiivePos = inverseNaiiveDelta.add(start);
+
+  if (!grid[vectorToTileIndex(naiivePos)].isSolid) return naiivePos;
+  if (!grid[vectorToTileIndex(secondNaiivePos)].isSolid) return secondNaiivePos;
+
+  // We should do ACTUAL pathfinding here.
+};
+
+const fastDist = (v1: Vector, v2: Vector) =>
+  Math.pow(v2.x - v1.x, 2) + Math.pow(v2.y - v1.y, 2);
+
+const vDist = (v1: Vector, v2: Vector) =>
+  Math.round(Math.sqrt(Math.pow(v1.x - v2.x, 2) + Math.pow(v1.y - v2.y, 2)));
 
 export default class World {
   private gameViews: GameViews;
@@ -175,7 +200,7 @@ export default class World {
 
     const mob = new Mob({
       name: "Znarf",
-      pos: new Vector(4, 4),
+      pos: new Vector(10, 10),
       hp: 1,
       char: "z",
       color: new Color(255),
@@ -223,24 +248,43 @@ export default class World {
     this.mobs.splice(vectorToTileIndex(pos), 1, undefined);
   }
 
-  handleMobMovement() {
-    this.mobs.forEach((M) => {
-      if (!M) return;
-      const oldPosition = M.position.clone();
+  handleMobMovement(playerPosition: Vector) {
+    this.mobs
+      .filter((a) => !!a)
+      .forEach((M) => {
+        const mobExistingPos = M.position.clone();
+        const mobPlayerDistance = vDist(playerPosition, mobExistingPos);
 
-      if (fastDist(this.player.position.clone(), oldPosition) > 3) {
-        this.mobs.splice(vectorToTileIndex(oldPosition), 1, undefined);
+        if (mobPlayerDistance > 5) {
+          this.mobs.splice(vectorToTileIndex(mobExistingPos), 1, undefined);
+          const newPosition = M.move(this.getSurroundingTiles(mobExistingPos));
 
-        const newPosition = M.move(this.getSurroundingTiles(oldPosition));
+          this.mobs[vectorToTileIndex(newPosition)] = M;
+        } else {
+          const newMobPos = findNextStep(
+            this.background,
+            mobExistingPos,
+            playerPosition
+          );
 
-        console.log("newMobPosition", newPosition);
+          if (newMobPos.equal(playerPosition)) {
+            // Attack player
+            console.log("player loses hp!");
+            return mobExistingPos;
+          } else {
+            M.moveTo(newMobPos);
+            this.mobs.splice(vectorToTileIndex(mobExistingPos), 1, undefined);
+            this.mobs[vectorToTileIndex(newMobPos)] = M;
+            return;
+          }
 
-        this.mobs[vectorToTileIndex(newPosition)] = M;
-      } else {
-        // Follow!
-        
-      }
-    });
+          console.log(
+            `Mob: ${M.fullName} didnt know where to go! We need Pathfinding!`
+          );
+
+          return mobExistingPos;
+        }
+      });
   }
 
   // TODO This is actally a "turn", not just move player.
@@ -281,10 +325,10 @@ export default class World {
       return;
     }
 
-    this.handleMobMovement();
     this.clearGameMessage();
     this.player.position = newPlayerPos;
     this.player.tile.pos = newPlayerPos;
+    this.handleMobMovement(newPlayerPos);
     this.drawToBuffer();
   }
 }

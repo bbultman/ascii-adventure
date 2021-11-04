@@ -2,7 +2,7 @@
   - Declarative fight sequences
   - All parties attack (modified by speed) and then we resolve who died
   - Movement
-    - Target-seeking
+    - Add real pathfinding to help navigate obstacles
 
 - Items
   - Items lying on the ground
