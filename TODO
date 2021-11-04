@@ -1,0 +1,21 @@
+- Mobs
+  - Declarative fight sequences
+  - All parties attack (modified by speed) and then we resolve who died
+  - Movement
+    - Target-seeking
+
+- Items
+  - Items lying on the ground
+  - Pick up items & inventory
+  - Inventory
+  - Wield items
+  - Items modify damage taken/given
+
+- Regain HP over time
+
+- UI
+  - HP/MP/XP as bars with colours
+
+- Time + Turns
+  - What is a turn, what is included?
+  - Setup turn counter
