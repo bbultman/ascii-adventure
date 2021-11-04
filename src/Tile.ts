@@ -28,4 +28,13 @@ export default class Tile {
     this.isVisible = options.isVisible ?? true
     this.isSolid = options.isSolid ?? false
   }
+
+  equal(tile: Tile) {
+    return this.char === tile.char &&
+      this.color.equal(tile.color) &&
+      this.background.equal(tile.background) &&
+      this.pos.equal(tile.pos) &&
+      this.isVisible === tile.isVisible &&
+      this.isSolid === tile.isSolid
+  }
 }
