@@ -139,6 +139,9 @@ const generateInfoTiles = (size: Vector, player: Player) => {
   return infoTiles;
 };
 
+const fastDist = (v: Vector, v2: Vector) =>
+  Math.pow(v2.x - v.x, 2) + Math.pow(v2.y - v.y, 2);
+
 export default class World {
   private gameViews: GameViews;
   info: Tile[];
@@ -197,11 +200,11 @@ export default class World {
 
   getSurroundingTiles(pos: Vector) {
     return [
-        pos.clone().add(new Vector(1, 0)),
-        pos.clone().add(new Vector(-1, 0)),
-        pos.clone().add(new Vector(0, 1)),
-        pos.clone().add(new Vector(0, -1)),
-      ]
+      pos.clone().add(new Vector(1, 0)),
+      pos.clone().add(new Vector(-1, 0)),
+      pos.clone().add(new Vector(0, 1)),
+      pos.clone().add(new Vector(0, -1)),
+    ];
   }
 
   clearGameMessage() {
@@ -223,14 +226,20 @@ export default class World {
   handleMobMovement() {
     this.mobs.forEach((M) => {
       if (!M) return;
-      const oldPosition = M.position.clone()
-      this.mobs.splice(vectorToTileIndex(oldPosition), 1, undefined)
+      const oldPosition = M.position.clone();
 
-      const newPosition = M.move(this.getSurroundingTiles(oldPosition));
+      if (fastDist(this.player.position.clone(), oldPosition) > 3) {
+        this.mobs.splice(vectorToTileIndex(oldPosition), 1, undefined);
 
-      console.log('newMobPosition', newPosition)
+        const newPosition = M.move(this.getSurroundingTiles(oldPosition));
 
-      this.mobs[vectorToTileIndex(newPosition)] = M
+        console.log("newMobPosition", newPosition);
+
+        this.mobs[vectorToTileIndex(newPosition)] = M;
+      } else {
+        // Follow!
+        
+      }
     });
   }
 
@@ -272,7 +281,7 @@ export default class World {
       return;
     }
 
-    this.handleMobMovement()
+    this.handleMobMovement();
     this.clearGameMessage();
     this.player.position = newPlayerPos;
     this.player.tile.pos = newPlayerPos;
