@@ -9,18 +9,21 @@ interface DrawingOperation {
   background: Color;
   pos: Vector;
   isVisible: boolean;
+  delete?: boolean;
 };
 
-const drawingOperation = (tile: Tile): DrawingOperation => ({
+const drawingOperation = (tile: Tile, deleteTile = false): DrawingOperation => ({
   tile,
   char: tile.char,
   color: tile.color.clone(),
   background: tile.background.clone(),
   pos: tile.pos.clone(),
-  isVisible: tile.isVisible
+  isVisible: tile.isVisible,
+  delete: deleteTile ?? false
 });
 
 interface LayerConstructorOptions {
+  name: string;
   opacity?: number;
   isVisible?: boolean;
   pos?: Vector;
@@ -29,6 +32,7 @@ interface LayerConstructorOptions {
 };
 
 export default class Layer {
+  readonly name: string
   opacity: number;
   isVisible: boolean;
   pos: Vector;
@@ -37,6 +41,7 @@ export default class Layer {
   private _z: number;
 
   constructor(options: LayerConstructorOptions) {
+    this.name = options.name;
     this.opacity = options.opacity || 1;
     this.isVisible = options.isVisible || true;
     this.pos = options.pos || Vector.Zero();
@@ -49,6 +54,10 @@ export default class Layer {
 
   draw(tile: Tile) {
     this.operations.push(drawingOperation(tile));
+  }
+
+  drop(tile: Tile) {
+    this.operations.push(drawingOperation(tile, true))
   }
 
   clear() {
