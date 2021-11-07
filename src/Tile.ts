@@ -6,6 +6,7 @@ export interface TileConstructorOptions {
   color: Color
   background: Color
   pos: Vector
+  isCorner: boolean
   isVisible: boolean
   isSolid: boolean
 }
@@ -15,6 +16,7 @@ export default class Tile {
   color: Color
   background: Color
   pos: Vector
+  isCorner: boolean
   isVisible: boolean
   isSolid: boolean
 
@@ -25,6 +27,7 @@ export default class Tile {
     this.color = options.color ?? new Color()
     this.background = options.background ?? new Color(0, 0, 0, 1)
     this.pos = options.pos ?? new Vector(0, 0)
+    this.isCorner = options.isCorner ?? false
     this.isVisible = options.isVisible ?? true
     this.isSolid = options.isSolid ?? false
   }

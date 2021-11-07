@@ -16,11 +16,7 @@ const vectorExpand = (size: Vector) =>
   );
 
 const buildSquare = (size: Vector) => {
-  const numberPossibleDoorPositions = (size.x - 2) * 2 + (size.y - 2) * 2;
-
-  let totalDoors = (numberPossibleDoorPositions / 10) * Math.random() + 1;
-
-  const roomTiles = vectorExpand(size).map((pos, i) => {
+  const roomTiles = vectorExpand(size).map((pos) => {
     const isCorner =
       (pos.x === 0 && (pos.y === 0 || pos.y === size.y - 1)) ||
       (pos.x === size.x - 1 && (pos.y === 0 || pos.y === size.y - 1));
@@ -31,17 +27,9 @@ const buildSquare = (size: Vector) => {
         pos.y === 0 ||
         pos.y === size.y - 1 ||
         pos.x === size.x - 1);
-    //const doorSeed = Math.sin(i * totalDoors * Math.random())
-    //const isDoor = isEdge ? doorSeed > 0.9 : false
 
-    //if (isEdge) {
-    //  console.log(i, pos, doorSeed, isDoor)
-    //}
-
-    return isCorner
-      ? makeSolidTile({ pos, char: "^" })
-      : isEdge
-      ? makeSolidTile({ pos })
+    return isEdge || isCorner
+      ? makeSolidTile({ pos, isCorner })
       : makeGroundTile({ pos, char: "." });
   });
 
@@ -61,22 +49,13 @@ const mergeTiles = (base: Tile[], addition: Tile[], pos: Vector): void => {
 const vectorToTileIndex = ({ x, y }: Vector) => y * WIDTH + x;
 
 const generateBackgroundTiles = (size: Vector) => {
-  const background = vectorExpand(size).map((pos: Vector, index: number) => {
-    const rand = Math.random();
-    const shouldBeSolid = index % 10 === 0 && rand < 0.1;
+  const background = buildSquare(size);
 
-    const isEdge =
-      pos.x === 0 || pos.x === WIDTH - 1 || pos.y === 0 || pos.y === HEIGHT - 1;
+  const room = buildSquare(new Vector(10, 10));
+  const room2 = buildSquare(new Vector(5, 4));
 
-    if (isEdge) return makeSolidTile({ pos });
-    if (shouldBeSolid) return makeSolidTile({ pos });
-
-    return makeGroundTile({ pos, char: "." });
-  });
-
-  const room = buildSquare(new Vector(5, 4));
-
-  mergeTiles(background, room, new Vector(WIDTH / 2, HEIGHT / 2));
+  mergeTiles(background, room, new Vector(2, 2));
+  mergeTiles(background, room2, new Vector(4, 5));
 
   return background;
 };
