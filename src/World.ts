@@ -138,6 +138,7 @@ const findNextStep = (grid: Tile[], start: Vector, goal: Vector) => {
   if (!grid[vectorToTileIndex(secondNaiivePos)].isSolid) return secondNaiivePos;
 
   // We should do ACTUAL pathfinding here.
+  return start
 };
 
 const fastDist = (v1: Vector, v2: Vector) =>
@@ -179,7 +180,7 @@ export default class World {
 
     const mob = new Mob({
       name: "Znarf",
-      pos: new Vector(10, 10),
+      pos: new Vector(7, 7),
       hp: 1,
       char: "z",
       color: new Color(255),

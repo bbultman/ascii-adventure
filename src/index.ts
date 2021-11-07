@@ -47,36 +47,46 @@ const gameViews: GameViews = {
 const renderer = new Renderer(gameViews);
 
 renderer.onBeforeDraw(function (layer: Layer) {
-  console.log('before draw, operation count', this.operations)
-  if (layer.name === "info") return
+  const playerPos = world.player.position.clone();
 
-  layer.operations.forEach((tile) => {
+  if (layer.name === 'background') {
+    const corners = layer.operations.filter(x => x.tile.isCorner).forEach(c => {
+      const intensity = getDistance(playerPos, c.pos)
+      console.log('Distance to corner', intensity, c.pos)
+      c.background.b = 255
+    })
+  }
+
+  if (layer.name === "info") return;
+
+  layer.operations.forEach((op) => {
     if (layer.name === "background") {
       if (
-        tile.pos.y === world.player.position.y &&
-        tile.pos.x === world.player.position.x
+        op.pos.y === world.player.position.y &&
+        op.pos.x === world.player.position.x
       ) {
         // Dont render ground under char's feet
-        tile.color.a = 0;
+        op.color.a = 0;
       }
     }
 
     // TODO Figure out how to make 'light' respect solid tiles (vector angle calculations?)
     // TODO Make this generic so it can be applied on objects as well
-    const playerTileDistance = getDistance(world.player.position, tile.pos);
+    const playerTileDistance = getDistance(playerPos, op.pos);
+
 
     if (playerTileDistance > 10) {
-      tile.isVisible = false;
+      op.isVisible = false;
       return;
     }
 
     if (playerTileDistance > 5) {
-      tile.isVisible = true;
-      tile.color.a = 0.4;
+      op.isVisible = true;
+      op.color.a = 0.4;
       return;
     }
 
-    tile.isVisible = true;
+    op.isVisible = true;
   });
 });
 
