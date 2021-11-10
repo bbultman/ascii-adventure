@@ -1,4 +1,4 @@
-import Layer from './Layer'
+import Layer, { Camera } from './Layer'
 import { makeGroundTile, makeSolidTile } from './Objects'
 import Renderer from './Renderer'
 import Vector from './Vector'
@@ -28,8 +28,13 @@ const gameViews: GameViews = {
     name: 'background',
     size: new Vector(WIDTH, HEIGHT),
     layers: [
+      new Layer({ name: 'inventory', size: new Vector(WIDTH, HEIGHT) }),
       new Layer({ name: 'background', size: new Vector(WIDTH, HEIGHT) }),
-      new Layer({ name: 'actor', size: new Vector(WIDTH, HEIGHT) }),
+      new Layer({
+        name: 'actor',
+        camera: new Camera(Vector.Zero(), new Vector(20, HEIGHT)),
+        size: new Vector(WIDTH, HEIGHT),
+      }),
     ],
   },
   info: {
@@ -89,6 +94,9 @@ document.addEventListener('readystatechange', () => {
     ready = true
 
     Time.on(TimeEvents.TICK, world.movePlayer.bind(world))
+    Time.on(TimeEvents.TICK, () =>
+      gameViews.main.layers.find((x) => x.name === 'actor').camera.moveCamera(world.playerMove)
+    )
     Time.on(TimeEvents.TICK, world.handleMobMovement.bind(world))
     Time.on(TimeEvents.TICK, () => {
       renderer.drawAll('background', world.background)

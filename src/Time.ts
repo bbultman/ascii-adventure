@@ -1,5 +1,9 @@
 import { EventEmitter } from './EventEmitter'
 
+const log = (...x) => {
+  if (false) console.log('TIME ->', ...x)
+}
+
 enum TimeEvents {
   START = 'START',
   TICK = 'TICK',
@@ -8,17 +12,18 @@ enum TimeEvents {
 
 class TimeEmitter extends EventEmitter<typeof TimeEvents> {
   private _turnCounter = 0
-  getTurns() {
-    return this._turnCounter
-  }
 
   constructor() {
     super()
 
     this.on(TimeEvents.TICK, () => {
       this._turnCounter++
-      console.log('TIME', this._turnCounter)
+      log(this._turnCounter)
     })
+  }
+
+  getTurns() {
+    return this._turnCounter
   }
 }
 

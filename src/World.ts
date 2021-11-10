@@ -122,7 +122,7 @@ const vDist = (v1: Vector, v2: Vector) => Math.round(Math.sqrt(Math.pow(v1.x - v
 
 export default class World {
   private gameViews: GameViews
-  private _playerMove: Vector = Vector.Zero()
+  playerMove: Vector = Vector.Zero()
   info: Tile[]
   readonly background: Tile[]
   readonly player: Player
@@ -159,7 +159,7 @@ export default class World {
   }
 
   setPlayerMove(vec: Vector) {
-    this._playerMove = vec
+    this.playerMove = vec
   }
 
   gameMessage(message: string) {
@@ -240,7 +240,7 @@ export default class World {
   }
 
   movePlayer() {
-    const newPlayerPos = this._playerMove.add(this.player.position)
+    const newPlayerPos = this.playerMove.clone().add(this.player.position)
     const positionIndex = vectorToTileIndex(newPlayerPos)
 
     const M = this.mobs[positionIndex]
@@ -268,7 +268,7 @@ export default class World {
     const backgroundTile = getTile(this.background, newPlayerPos)
 
     if (backgroundTile.isSolid) {
-      this._playerMove = Vector.Zero()
+      this.playerMove = Vector.Zero()
       this.gameMessage('You hit the wall...Ouch!')
       return
     }
@@ -276,6 +276,5 @@ export default class World {
     this.clearGameMessage()
     this.player.position = newPlayerPos
     this.player.tile.pos = newPlayerPos
-    this._playerMove = Vector.Zero()
   }
 }
