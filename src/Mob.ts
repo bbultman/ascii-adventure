@@ -52,7 +52,7 @@ export default class Mob {
 
   move(matrix: Vector[]) {
     const index = Math.floor(Math.random() * matrix.length)
-    const movePos = matrix[index];
+    const movePos = matrix[index]
 
     this.moveTo(movePos)
 

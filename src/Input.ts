@@ -3,6 +3,7 @@ import Vector from './Vector'
 import World from './World'
 
 enum Actions {
+  NOOP = 'NOOP',
   MV_UP = 'MV_UP',
   MV_DOWN = 'MV_DOWN',
   MV_LEFT = 'MV_LEFT',
@@ -28,6 +29,10 @@ export default (world: World) => {
       }
       case Actions.MV_RIGHT: {
         playerMove = new Vector(1, 0)
+        break
+      }
+      case Actions.NOOP: {
+        playerMove = Vector.Zero()
         break
       }
       default: {
@@ -59,6 +64,10 @@ export default (world: World) => {
       case 'l':
       case 'ArrowRight': {
         handleKeydown(Actions.MV_RIGHT)
+        break
+      }
+      case '5': {
+        handleKeydown(Actions.NOOP)
         break
       }
     }
