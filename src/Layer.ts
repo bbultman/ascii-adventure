@@ -34,9 +34,10 @@ export class Camera {
 
   constructor(topLeft: Vector, bottomRight: Vector) {
     this.setFrame(topLeft.y, bottomRight.y, topLeft.x, bottomRight.x)
+    log('Created Camera', [this.left, this.top, this.right, this.bottom])
   }
 
-  isInView({ x, y }: Vector) {
+  canSee({ x, y }: Vector) {
     return x > this.left - 1 && x < this.right + 1 && y > this.top - 1 && y < this.bottom + 1
   }
 
@@ -76,23 +77,18 @@ export default class Layer {
   operations: Array<DrawingOperation> = []
 
   constructor(options: LayerConstructorOptions) {
-    this.camera = options.camera ?? new Camera(Vector.Zero(), options.size) // Layer-sized default camera
+    this.camera = options.camera
     this.name = options.name
     this.opacity = options.opacity ?? 1
     this.isVisible = options.isVisible ?? true
     this.pos = options.pos ?? Vector.Zero()
     this.size = options.size
 
-    log('Created layer', this.name, 'with camera', [
-      this.camera.left,
-      this.camera.top,
-      this.camera.right,
-      this.camera.bottom,
-    ])
+    log('Created layer', this.name, 'pos', this.pos, 'size', this.size)
   }
 
   draw(tile: Tile) {
-    if (!this.camera.isInView(tile.pos)) return
+    if (this.camera && !this.camera.canSee(tile.pos)) return
 
     this.operations.push(drawingOperation(tile))
   }

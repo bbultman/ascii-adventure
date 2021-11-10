@@ -5,6 +5,8 @@ import Vector from './Vector'
 import World from './World'
 import buildInputHandler from './Input'
 import { Time, TimeEvents } from './Time'
+import { handlePlayerAction } from './Actions'
+import Inventory from './Inventory'
 
 const WIDTH = 80
 const HEIGHT = 24
@@ -23,18 +25,20 @@ export type GameViews = {
   info: GameView
 }
 
+const inventoryLayer = new Layer({ name: 'inventory', size: new Vector(WIDTH, HEIGHT), opacity: 0 })
+
 const gameViews: GameViews = {
   main: {
     name: 'background',
     size: new Vector(WIDTH, HEIGHT),
     layers: [
-      new Layer({ name: 'inventory', size: new Vector(WIDTH, HEIGHT) }),
       new Layer({ name: 'background', size: new Vector(WIDTH, HEIGHT) }),
       new Layer({
         name: 'actor',
         camera: new Camera(Vector.Zero(), new Vector(20, HEIGHT)),
         size: new Vector(WIDTH, HEIGHT),
       }),
+      inventoryLayer,
     ],
   },
   info: {
@@ -85,10 +89,13 @@ renderer.onBeforeDraw(function (layer: Layer) {
 })
 
 const world = new World(gameViews, renderer.drop.bind(renderer))
+const inventory = new Inventory(inventoryLayer, new Vector(WIDTH, HEIGHT))
+const playerActionHandler = handlePlayerAction(world, inventory)
+const keyboardHandler = buildInputHandler(playerActionHandler)
 
 let ready = false
 
-document.addEventListener('keydown', buildInputHandler(world))
+document.addEventListener('keydown', keyboardHandler)
 document.addEventListener('readystatechange', () => {
   if (!ready) {
     ready = true

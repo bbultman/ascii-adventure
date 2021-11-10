@@ -43,7 +43,7 @@ const generateBackgroundTiles = (size: Vector) => {
 
   const room = buildSquare(new Vector(10, 10))
 
-  mergeTiles(background, room, new Vector(10, 10))
+  mergeTiles(background, room, new Vector(15, 10))
 
   return background
 }
