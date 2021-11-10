@@ -19,4 +19,35 @@
   - Add UI layer for storytelling etc
 
 - Rendering
-  - Add a camera to give the renderer (limited) scope for changes
+  - Inventory UI & input
+
+
+Notes
+
+Game Views, cameras, input
+
+Game view
+  - Size
+  - Layers[]
+    - Size
+    - Camera?
+    - Keymap
+
++---------------------------------------------+
+|            +-----------+                    |
+|            |  Camera   |                    |
+| Layer X    |           |                    |
+|            |           |                    |
+|            |           |                    |
+|            +-----------+                    |
+|                                             |
+|            not rendered                     |
+|                                             |
++---------------------------------------------+
+
+Can be many layers over the same game view, but a layer:
+
+  1. Optionally contains a camera
+  2. Optionally contains a keymap
+  3. Has a Z position (the order in which it's added)
+  4. Should only schedule render work for the camera view (if any)
