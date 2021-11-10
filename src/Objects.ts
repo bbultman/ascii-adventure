@@ -7,3 +7,5 @@ export const makeGroundTile = (opts?: Partial<TileConstructorOptions>) =>
     ...opts,
     isSolid: false,
   })
+
+export const makeMobTile = (opts?: Partial<TileConstructorOptions>) => new Tile({ char: 'm', isSolid: true, ...opts })
