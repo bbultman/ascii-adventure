@@ -50,16 +50,6 @@ const renderer = new Renderer(gameViews)
 renderer.onBeforeDraw(function (layer: Layer) {
   const playerPos = world.player.position.clone()
 
-  if (layer.name === 'background') {
-    layer.operations
-      .filter((x) => x.tile.isCorner)
-      .forEach((c) => {
-        const intensity = getDistance(playerPos, c.pos)
-        console.log('Distance to corner', intensity, c.pos)
-        c.background.b = 255
-      })
-  }
-
   if (layer.name === 'info') return
 
   layer.operations.forEach((op) => {

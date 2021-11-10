@@ -42,10 +42,8 @@ const generateBackgroundTiles = (size: Vector) => {
   const background = buildSquare(size)
 
   const room = buildSquare(new Vector(10, 10))
-  const room2 = buildSquare(new Vector(5, 4))
 
-  mergeTiles(background, room, new Vector(2, 2))
-  mergeTiles(background, room2, new Vector(4, 5))
+  mergeTiles(background, room, new Vector(10, 10))
 
   return background
 }
@@ -94,27 +92,31 @@ const generateInfoTiles = (size: Vector, player: Player) => {
 const findNextStep = (grid: Tile[], start: Vector, goal: Vector) => {
   const xDelta = goal.x - start.x
   const yDelta = goal.y - start.y
+  const couldMoveX = xDelta !== 0
+  const couldMoveY = yDelta !== 0
 
-  const horizontal = Math.abs(xDelta) > Math.abs(yDelta)
+  // Do we have further to go horizontally or vertically?
+  const horizontalBias = Math.abs(xDelta) > Math.abs(yDelta)
 
+  // Left or right?
   const xMove = xDelta > 0 ? new Vector(1, 0) : new Vector(-1, 0)
+  // Up or down?
   const yMove = yDelta > 0 ? new Vector(0, 1) : new Vector(0, -1)
 
-  const naiiveDelta = horizontal ? xMove : yMove
+  const xPos = xMove.add(start)
+  const yPos = yMove.add(start)
 
-  const inverseNaiiveDelta = !horizontal ? xMove : yMove
+  const yTileIsSolid = getTile(grid, yPos).isSolid
+  const xTileIsSolid = getTile(grid, xPos).isSolid
 
-  const naiivePos = naiiveDelta.add(start)
-  const secondNaiivePos = inverseNaiiveDelta.add(start)
+  if (horizontalBias && !xTileIsSolid) return xPos
+  if (!horizontalBias && !yTileIsSolid) return yPos
 
-  if (!grid[vectorToTileIndex(naiivePos)].isSolid) return naiivePos
-  if (!grid[vectorToTileIndex(secondNaiivePos)].isSolid) return secondNaiivePos
+  if (horizontalBias && xTileIsSolid && couldMoveY && !yTileIsSolid) return yPos
+  if (!horizontalBias && yTileIsSolid && couldMoveX && !xTileIsSolid) return xPos
 
-  // We should do ACTUAL pathfinding here.
   return start
 }
-
-const fastDist = (v1: Vector, v2: Vector) => Math.pow(v2.x - v1.x, 2) + Math.pow(v2.y - v1.y, 2)
 
 const vDist = (v1: Vector, v2: Vector) => Math.round(Math.sqrt(Math.pow(v1.x - v2.x, 2) + Math.pow(v1.y - v2.y, 2)))
 
@@ -146,9 +148,9 @@ export default class World {
 
     const mob = new Mob({
       name: 'Znarf',
-      pos: new Vector(10, 10),
+      pos: new Vector(12, 12),
       hp: 2,
-      char: 'z',
+      char: 'Z',
       color: new Color(255),
       background: new Color(0, 0, 0, 1),
     })
@@ -178,7 +180,7 @@ export default class World {
       pos.clone().add(new Vector(-1, 0)),
       pos.clone().add(new Vector(0, 1)),
       pos.clone().add(new Vector(0, -1)),
-    ]
+    ].filter((pos) => !getTile(this.background, pos).isSolid)
   }
 
   clearGameMessage() {
@@ -210,24 +212,30 @@ export default class World {
           const newPosition = M.move(this.getSurroundingTiles(mobExistingPos))
 
           this.mobs[vectorToTileIndex(newPosition)] = M
-        } else {
-          const newMobPos = findNextStep(this.background, mobExistingPos, playerPos)
-
-          if (newMobPos.equal(playerPos)) {
-            // Attack player
-            console.log('player loses hp!')
-            return mobExistingPos
-          } else {
-            M.moveTo(newMobPos)
-            this.mobs.splice(vectorToTileIndex(mobExistingPos), 1, undefined)
-            this.mobs[vectorToTileIndex(newMobPos)] = M
-            return
-          }
-
-          console.log(`Mob: ${M.fullName} didnt know where to go! We need Pathfinding!`)
-
-          return mobExistingPos
+          return
         }
+
+        const newMobPos = findNextStep(this.background, mobExistingPos, playerPos)
+
+        if (getTile(this.background, newMobPos).isSolid) {
+          console.log('Mob found wall, cant move to', newMobPos)
+          return
+        }
+
+        if (newMobPos.equal(playerPos)) {
+          // Attack player
+          console.log('player loses hp!')
+          this.player.hp--
+          this.info = generateInfoTiles(this.gameViews.info.size, this.player)
+          return mobExistingPos
+        } else {
+          M.moveTo(newMobPos)
+          this.mobs.splice(vectorToTileIndex(mobExistingPos), 1, undefined)
+          this.mobs[vectorToTileIndex(newMobPos)] = M
+          return
+        }
+
+        console.log(`Mob: ${M.fullName} didnt know where to go! We need Pathfinding!`)
       })
   }
 
