@@ -1,3 +1,4 @@
+import Color from './Color'
 import Layer from './Layer'
 import Tile from './Tile'
 import Vector from './Vector'
@@ -11,57 +12,34 @@ const vectorExpand = (size: Vector) =>
 
 const buildSquare = (size: Vector) => vectorExpand(size).map((pos) => new Tile({ pos, char: ' ' }))
 
+const posToIndex = ({ x, y }: Vector) => y * 80 + x
 const mergeTiles = (base: Tile[], addition: Tile[], pos: Vector): void => {
   addition.forEach((newTile) => {
-    base[vectorToTileIndex(newTile.pos.add(pos))] = newTile
+    base[posToIndex(newTile.pos.add(pos))] = newTile
   })
 }
 
 const generateBackgroundTiles = (size: Vector) => {
   const background = buildSquare(size)
 
+  writeIntoTiles('Inventory', background, new Vector(35, 0))
+
   return background
 }
 
 const writeIntoTiles = (input: string, target: Tile[], pos: Vector) => {
-  const tiles = input.split('').map((char, x) => new Tile({ char, pos: new Vector(x, 0) }))
-
-  mergeTiles(target, tiles, pos)
-}
-
-const generateInfoTiles = (size: Vector, player: Player) => {
-  const infoTiles = vectorExpand(size).map((pos) => new Tile({ pos }))
-
-  const borderTiles = vectorExpand(new Vector(WIDTH, 1)).map(
-    (pos) => new Tile({ char: '-', pos, color: new Color(255, 255, 255, 0.5) })
+  const tiles = input.split('').map(
+    (char, x) =>
+      new Tile({
+        char,
+        color: new Color(255, 255, 255, 1),
+        background: new Color(0, 0, 0, 1),
+        pos: new Vector(x, 0),
+        isVisible: true,
+      })
   )
 
-  mergeTiles(infoTiles, borderTiles, Vector.Zero())
-
-  const xOffset = 1
-  const statRow = 3
-  const statWidth = 7
-  const statLabels = [
-    `Str ${player.stats.strength}`,
-    `Dex ${player.stats.dexterity}`,
-    `Per ${player.stats.perception}`,
-    `Int ${player.stats.intelligence}`,
-    `Wis ${player.stats.wisdom}`,
-  ]
-
-  statLabels.forEach((stat, index) => {
-    writeIntoTiles(stat, infoTiles, new Vector(index * statWidth + xOffset, statRow))
-  })
-
-  const xpLabel = `Xp ${player.experience}`
-
-  writeIntoTiles(xpLabel, infoTiles, new Vector(WIDTH - Math.max(statWidth, xpLabel.length + 1), statRow))
-
-  const hpLabel = `Hp ${player.hp}/${player.maxHp}`
-
-  writeIntoTiles(hpLabel, infoTiles, new Vector(statLabels.length + statLabels.length * (xOffset + statWidth), statRow))
-
-  return infoTiles
+  mergeTiles(target, tiles, pos)
 }
 
 export default class Inventory {

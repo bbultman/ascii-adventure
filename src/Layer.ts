@@ -71,7 +71,6 @@ export default class Layer {
   camera: Camera
   readonly name: string
   opacity: number
-  isVisible: boolean
   pos: Vector
   size: Vector
   operations: Array<DrawingOperation> = []
@@ -80,7 +79,6 @@ export default class Layer {
     this.camera = options.camera
     this.name = options.name
     this.opacity = options.opacity ?? 1
-    this.isVisible = options.isVisible ?? true
     this.pos = options.pos ?? Vector.Zero()
     this.size = options.size
 

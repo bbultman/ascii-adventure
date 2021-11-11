@@ -1,11 +1,12 @@
 import { EventEmitter } from './EventEmitter'
 
 const log = (...x) => {
-  if (false) console.log('TIME ->', ...x)
+  if (true) console.log('TIME ->', ...x)
 }
 
 enum TimeEvents {
   START = 'START',
+  TURN = 'TURN',
   TICK = 'TICK',
   END = 'END',
 }

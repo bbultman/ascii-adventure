@@ -17,25 +17,27 @@ export enum PlayerActions {
 }
 
 export const handlePlayerAction = (world: World, inv: Inventory) => (action: PlayerActions) => {
-  let playerMove = Vector.Zero()
-
   log(action)
 
   switch (action) {
     case PlayerActions.MV_UP: {
-      playerMove = new Vector(0, -1)
+      world.setPlayerMove(new Vector(0, -1))
+      Time.emit(TimeEvents.TURN)
       break
     }
     case PlayerActions.MV_DOWN: {
-      playerMove = new Vector(0, 1)
+      world.setPlayerMove(new Vector(0, 1))
+      Time.emit(TimeEvents.TURN)
       break
     }
     case PlayerActions.MV_LEFT: {
-      playerMove = new Vector(-1, 0)
+      world.setPlayerMove(new Vector(-1, 0))
+      Time.emit(TimeEvents.TURN)
       break
     }
     case PlayerActions.MV_RIGHT: {
-      playerMove = new Vector(1, 0)
+      world.setPlayerMove(new Vector(1, 0))
+      Time.emit(TimeEvents.TURN)
       break
     }
     case PlayerActions.INVENTORY_TOGGLE: {
@@ -48,8 +50,6 @@ export const handlePlayerAction = (world: World, inv: Inventory) => (action: Pla
       log('No action taken for Player Action', action)
     }
   }
-
-  world.setPlayerMove(playerMove)
 
   // Push time forwards by 1, triggers render
   Time.emit(TimeEvents.TICK)

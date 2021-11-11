@@ -2,6 +2,10 @@ import { GameViews } from './index'
 import Layer from './Layer'
 import Tile from './Tile'
 
+const log = (...x) => {
+  if (true) console.log('RENDERER ->', ...x)
+}
+
 type RendererParams = GameViews
 
 export default class Renderer {
@@ -54,6 +58,7 @@ export default class Renderer {
 
   commit() {
     this.layers.forEach((layer) => {
+      log('beforeDraw for', layer)
       this.beforeDraw(layer)
     })
 

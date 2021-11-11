@@ -55,6 +55,7 @@ const gameViews: GameViews = {
 }
 
 const renderer = new Renderer(gameViews)
+const playerCam = gameViews.main.layers.find((x) => x.name === 'actor').camera
 
 renderer.onBeforeDraw(function (layer: Layer) {
   const playerPos = world.player.position.clone()
@@ -62,6 +63,7 @@ renderer.onBeforeDraw(function (layer: Layer) {
   if (layer.name === 'info') return
 
   layer.operations.forEach((op) => {
+    if (layer.name === 'inventory') return
     if (layer.name === 'background') {
       if (op.pos.y === world.player.position.y && op.pos.x === world.player.position.x) {
         // Dont render ground under char's feet
@@ -69,16 +71,23 @@ renderer.onBeforeDraw(function (layer: Layer) {
       }
     }
 
-    // TODO Figure out how to make 'light' respect solid tiles (vector angle calculations?)
-    // TODO Make this generic so it can be applied on objects as well
-    const playerTileDistance = getDistance(playerPos, op.pos)
+    const tileInCameraView = playerCam.canSee(op.pos)
 
-    if (playerTileDistance > 10) {
+    if (!tileInCameraView) {
       op.isVisible = false
       return
     }
 
-    if (playerTileDistance > 5) {
+    // TODO Figure out how to make 'light' respect solid tiles (vector angle calculations?)
+    // TODO Make this generic so it can be applied on objects as well
+    const playerTileDistance = getDistance(playerPos, op.pos)
+
+    if (playerTileDistance > 6) {
+      op.isVisible = false
+      return
+    }
+
+    if (playerTileDistance > 3) {
       op.isVisible = true
       op.color.a = 0.4
       return
@@ -100,10 +109,13 @@ document.addEventListener('readystatechange', () => {
   if (!ready) {
     ready = true
 
-    Time.on(TimeEvents.TICK, world.movePlayer.bind(world))
-    Time.on(TimeEvents.TICK, () =>
-      gameViews.main.layers.find((x) => x.name === 'actor').camera.moveCamera(world.playerMove)
-    )
+    const playerCam = gameViews.main.layers.find((x) => x.name === 'actor').camera
+
+    Time.on(TimeEvents.START, () => renderer.drawAll('background', world.background))
+    Time.on(TimeEvents.START, () => renderer.drawAll('info', world.info))
+
+    Time.on(TimeEvents.TURN, world.movePlayer.bind(world))
+    Time.on(TimeEvents.TURN, () => playerCam.moveCamera(world.playerMove))
     Time.on(TimeEvents.TICK, world.handleMobMovement.bind(world))
     Time.on(TimeEvents.TICK, () => {
       renderer.drawAll('background', world.background)

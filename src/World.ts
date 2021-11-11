@@ -134,7 +134,7 @@ export default class World {
       background: new Color(0, 0, 0, 0),
       char: '@',
       color: new Color(255, 0, 0, 1),
-      pos: new Vector(5, 5),
+      pos: new Vector(10, 5),
       maxHp: 10,
     })
 
@@ -201,42 +201,41 @@ export default class World {
 
   handleMobMovement() {
     const playerPos = this.player.position.clone()
-    this.mobs
-      .filter((a) => !!a)
-      .forEach((M) => {
-        const mobExistingPos = M.position.clone()
-        const mobPlayerDistance = vDist(playerPos, mobExistingPos)
+    this.mobs.forEach((M) => {
+      if (!M) return
+      const mobExistingPos = M.position.clone()
+      const mobPlayerDistance = vDist(playerPos, mobExistingPos)
 
-        if (mobPlayerDistance > 5) {
-          this.mobs.splice(vectorToTileIndex(mobExistingPos), 1, undefined)
-          const newPosition = M.move(this.getSurroundingTiles(mobExistingPos))
+      if (mobPlayerDistance > this.player.sightDistance) {
+        this.mobs.splice(vectorToTileIndex(mobExistingPos), 1, undefined)
+        const newPosition = M.move(this.getSurroundingTiles(mobExistingPos))
 
-          this.mobs[vectorToTileIndex(newPosition)] = M
-          return
-        }
+        this.mobs[vectorToTileIndex(newPosition)] = M
+        return
+      }
 
-        const newMobPos = findNextStep(this.background, mobExistingPos, playerPos)
+      const newMobPos = findNextStep(this.background, mobExistingPos, playerPos)
 
-        if (getTile(this.background, newMobPos).isSolid) {
-          console.log('Mob found wall, cant move to', newMobPos)
-          return
-        }
+      if (getTile(this.background, newMobPos).isSolid) {
+        console.log('Mob found wall, cant move to', newMobPos)
+        return
+      }
 
-        if (newMobPos.equal(playerPos)) {
-          // Attack player
-          console.log('player loses hp!')
-          this.player.hp--
-          this.info = generateInfoTiles(this.gameViews.info.size, this.player)
-          return mobExistingPos
-        } else {
-          M.moveTo(newMobPos)
-          this.mobs.splice(vectorToTileIndex(mobExistingPos), 1, undefined)
-          this.mobs[vectorToTileIndex(newMobPos)] = M
-          return
-        }
+      if (newMobPos.equal(playerPos)) {
+        // Attack player
+        console.log('player loses hp!')
+        this.player.hp--
+        this.info = generateInfoTiles(this.gameViews.info.size, this.player)
+        return mobExistingPos
+      } else {
+        M.moveTo(newMobPos)
+        this.mobs.splice(vectorToTileIndex(mobExistingPos), 1, undefined)
+        this.mobs[vectorToTileIndex(newMobPos)] = M
+        return
+      }
 
-        console.log(`Mob: ${M.fullName} didnt know where to go! We need Pathfinding!`)
-      })
+      console.log(`Mob: ${M.fullName} didnt know where to go! We need Pathfinding!`)
+    })
   }
 
   movePlayer() {
