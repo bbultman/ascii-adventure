@@ -63,6 +63,7 @@ const playerCam = gameViews.main.layers.find((x) => x.name === 'actor').camera
 
 renderer.onBeforeDraw(function (layer: Layer) {
   const playerPos = world.player.position.clone()
+  const lightRadius = world.player.sightDistance
 
   if (layer.name === 'info') return
 
@@ -86,12 +87,13 @@ renderer.onBeforeDraw(function (layer: Layer) {
     // TODO Make this generic so it can be applied on objects as well
     const playerTileDistance = getDistance(playerPos, op.pos)
 
-    if (playerTileDistance > 6) {
+    if (playerTileDistance > lightRadius) {
       op.isVisible = false
       return
     }
 
-    if (playerTileDistance <= 6 && playerTileDistance > 0) {
+
+    if (playerTileDistance <= lightRadius && playerTileDistance > 0) {
       op.isVisible = true
       const alpha = 1 - playerTileDistance * 0.15
 
