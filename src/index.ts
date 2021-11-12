@@ -8,6 +8,10 @@ import { Time, TimeEvents } from './Time'
 import { handlePlayerAction } from './Actions'
 import Inventory from './Inventory'
 
+const log = (...x) => {
+  if (false) console.log('INDEX ->', ...x)
+}
+
 const WIDTH = 80
 const HEIGHT = 24
 
@@ -87,9 +91,11 @@ renderer.onBeforeDraw(function (layer: Layer) {
       return
     }
 
-    if (playerTileDistance > 3) {
+    if (playerTileDistance <= 6 && playerTileDistance > 0) {
       op.isVisible = true
-      op.color.a = 0.4
+      const alpha = 1 - playerTileDistance * 0.15
+
+      op.color.a = alpha
       return
     }
 
