@@ -27,7 +27,7 @@ export default class Player {
   private _experience: number
   hp: number
   maxHp: number
-  sightDistance = 10
+  sightDistance = 6
 
   constructor({ background, char, color, pos, stats = {}, maxHp }) {
     this.tile = new Tile({

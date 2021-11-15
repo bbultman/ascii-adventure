@@ -92,12 +92,13 @@ renderer.onBeforeDraw(function (layer: Layer) {
       return
     }
 
-
-    if (playerTileDistance <= lightRadius && playerTileDistance > 0) {
-      op.isVisible = true
-      const alpha = 1 - playerTileDistance * 0.15
+    if (playerTileDistance <= lightRadius && playerTileDistance > 1) {
+      const maxAlpha = 1
+      const alphaStep = maxAlpha / lightRadius
+      const alpha = maxAlpha - playerTileDistance * alphaStep
 
       op.color.a = alpha
+      op.isVisible = true
       return
     }
 
