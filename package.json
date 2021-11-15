@@ -5,15 +5,13 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "parcel src/index.html"
+    "start": "parcel src/index.html --open"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "parcel": "^2.0.0-beta.1"
-  },
   "devDependencies": {
+    "parcel": "^2.0.1",
     "ts-node": "^10.4.0",
     "typescript": "^4.4.4"
   }
